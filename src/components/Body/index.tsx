@@ -26,7 +26,7 @@ function Body() {
   return (
     <Container>
       <Autocomplete />
-      <ListWrapper>
+      <ListWrapper data-cy="planet-list">
         {selected.map((planet: Planet) => (
           <Card key={planet.code} data={planet} />
         ))}

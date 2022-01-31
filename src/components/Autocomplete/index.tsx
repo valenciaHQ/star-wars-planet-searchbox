@@ -51,6 +51,8 @@ function Autocomplete(): ReactElement {
     });
   };
 
+  const toogleComponent = () => setIsComponentVisible(!isComponentVisible);
+
   return (
     <Root>
       <div>
@@ -61,12 +63,16 @@ function Autocomplete(): ReactElement {
           onChange={onTextChanged}
           type="text"
         />
-        <AutoCompleteIcon isOpen={isComponentVisible}>
+        <AutoCompleteIcon
+          isOpen={isComponentVisible}
+          onClick={toogleComponent}
+          data-cy="cy-autocomplete-icon"
+        >
           {isComponentVisible ? <ArrowDown /> : <ArrowUp />}
         </AutoCompleteIcon>
       </div>
       {suggestions.length > 0 && isComponentVisible && (
-        <AutoCompleteContainer>
+        <AutoCompleteContainer data-cy="cy-options-wrapper">
           {suggestions.map((item: Planet) => (
             <AutoCompleteItem key={item.code}>
               <AutoCompleteItemButton
