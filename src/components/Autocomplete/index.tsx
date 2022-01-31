@@ -1,7 +1,9 @@
-import React, { ChangeEvent, FC, useState } from "react";
-import { IAutocomplete, IData } from "../../types";
+import React, { ChangeEvent, ReactElement, useContext, useState } from "react";
+import { AppContext } from "../../AppProvider";
+import { AppActionTypes, AppState, IAutocomplete, Planet } from "../../types";
 import {
   ArrowDown,
+  ArrowUp,
   AutoCompleteContainer,
   AutoCompleteIcon,
   AutoCompleteItem,
@@ -10,63 +12,62 @@ import {
   Root,
 } from "./styled";
 
-const Autocomplete: FC<IAutocomplete> = ({ data }) => {
-  const [search, setSearch] = useState<{ suggestions: IData[]; text: string }>({
-    text: "",
-    suggestions: [],
-  });
+function Autocomplete(): ReactElement {
   const [isComponentVisible, setIsComponentVisible] = useState(true);
+
+  const { state, dispatch } = useContext(AppContext);
+  const { text, suggestions }: IAutocomplete = state.search;
+  const { data }: AppState = state;
+
   const onTextChanged = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    let suggestions: IData[] = [];
+    const { value } = e.target;
+    let currentSuggestions: Planet[] = [];
     if (value.length > 0) {
       const regex = new RegExp(`^${value}`, "i");
-      suggestions = data.sort().filter((v: IData) => regex.test(v.name));
+      currentSuggestions = data
+        .sort()
+        .filter((v: Planet) => regex.test(v.name));
     }
     setIsComponentVisible(true);
-    setSearch({ suggestions, text: value });
-  };
-
-  const suggestionSelected = (value: IData) => {
-    setIsComponentVisible(false);
-
-    setSearch({
-      text: value.name,
-      suggestions: [],
+    dispatch({
+      type: AppActionTypes.SEARCH,
+      payload: {
+        search: {
+          suggestions: currentSuggestions,
+          text: value,
+        },
+      },
     });
   };
 
-  const { suggestions } = search;
+  const suggestionSelected = (value: Planet) => {
+    setIsComponentVisible(false);
+    dispatch({
+      type: AppActionTypes.SUGGESTION_SELECTED,
+      payload: {
+        search: { suggestions: [], text: value.name },
+        selected: data.find((planet: Planet) => planet.name === value.name),
+      },
+    });
+  };
+
   return (
     <Root>
-      <div
-        onClick={() => setIsComponentVisible(false)}
-        style={{
-          display: isComponentVisible ? "block" : "none",
-          width: "200vw",
-          height: "200vh",
-          backgroundColor: "transparent",
-          position: "fixed",
-          zIndex: 0,
-          top: 0,
-          left: 0,
-        }}
-      />
       <div>
         <Input
           id="input"
           autoComplete="off"
-          value={search.text}
+          value={text}
           onChange={onTextChanged}
-          type={"text"}
+          type="text"
         />
         <AutoCompleteIcon isOpen={isComponentVisible}>
-          <ArrowDown />
+          {isComponentVisible ? <ArrowDown /> : <ArrowUp />}
         </AutoCompleteIcon>
       </div>
       {suggestions.length > 0 && isComponentVisible && (
         <AutoCompleteContainer>
-          {suggestions.map((item: IData) => (
+          {suggestions.map((item: Planet) => (
             <AutoCompleteItem key={item.code}>
               <AutoCompleteItemButton
                 key={item.code}
@@ -80,6 +81,6 @@ const Autocomplete: FC<IAutocomplete> = ({ data }) => {
       )}
     </Root>
   );
-};
+}
 
-export default React.memo(Autocomplete);
+export default Autocomplete;

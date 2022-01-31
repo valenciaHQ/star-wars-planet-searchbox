@@ -1,18 +1,38 @@
-import { IData } from "../../types";
+import React, { useContext } from "react";
+import styled from "styled-components";
+import { AppContext } from "../../AppProvider";
+import { AppState, Planet } from "../../types";
 import Autocomplete from "../Autocomplete";
+import Card from "../Card";
 
-const data: IData[] = [
-  { code: crypto.randomUUID(), name: "apple" },
-  { code: crypto.randomUUID(), name: "apricot" },
-  { code: crypto.randomUUID(), name: "banana" },
-];
+const Container = styled.main`
+  display: flex;
+  height: 70vh;
+  flex-direction: column;
+  align-items: center;
+`;
 
-const Body = () => {
+const ListWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  overflow: auto;
+`;
+
+function Body() {
+  const { state } = useContext(AppContext);
+  const { selected } = state as AppState;
   return (
-    <section>
-      <Autocomplete data={data} />
-    </section>
+    <Container>
+      <Autocomplete />
+      <ListWrapper>
+        {selected.map((planet: Planet) => (
+          <Card key={planet.code} data={planet} />
+        ))}
+      </ListWrapper>
+    </Container>
   );
-};
+}
 
 export default Body;
