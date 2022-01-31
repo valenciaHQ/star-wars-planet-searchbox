@@ -1,4 +1,4 @@
-import React, { Reducer, useMemo, useReducer } from "react";
+import React, { ReactElement, Reducer, useMemo, useReducer } from "react";
 import { AppAction, AppState, Planet } from "./types";
 
 const AppContext = React.createContext<any>({});
@@ -14,8 +14,6 @@ const initialState: AppState = {
 };
 
 function appReducer(state: AppState, action: AppAction) {
-  console.log("action: ", action);
-  console.log("state: ", state);
   switch (action.type) {
     case "SEARCH": {
       return { ...state, search: action.payload.search };
@@ -60,7 +58,11 @@ function appReducer(state: AppState, action: AppAction) {
   }
 }
 
-function AppProvider({ children }: any) {
+interface IProvider {
+  children: ReactElement;
+}
+
+function AppProvider({ children }: IProvider) {
   const [state, dispatch] = useReducer<Reducer<AppState, AppAction>>(
     appReducer,
     initialState

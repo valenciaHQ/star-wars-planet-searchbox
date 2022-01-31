@@ -1,5 +1,5 @@
 /* eslint-disable comma-dangle */
-import React from "react";
+import React, { ReactElement } from "react";
 import { ThemeProvider } from "styled-components";
 
 const theme = {
@@ -16,8 +16,11 @@ const theme = {
     xLarge: "2rem",
   },
 };
+interface ITheme {
+  children: ReactElement;
+}
 
-function Theme({ children }: any) {
+function Theme({ children }: ITheme) {
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
 
